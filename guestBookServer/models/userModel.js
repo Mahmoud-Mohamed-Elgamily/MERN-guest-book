@@ -5,7 +5,7 @@ autoIncrement.initialize(mongoose.connection);
 
 let userSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  user: { type: String, required: true, unique: true },
+  userName: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   events_id: [{type: ObjectID ,ref:'event'}],
   replies_id: [{type: ObjectID ,ref:'reply'}],
