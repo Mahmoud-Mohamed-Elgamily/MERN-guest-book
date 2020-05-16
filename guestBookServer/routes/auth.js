@@ -30,8 +30,8 @@ router.post("/login", (req, res) => {
 
 router.post("/register", (req, res) => {
 
-  if (req.body.password == req.body.password2) {
-    delete req.body.password2
+  if (req.body.password == req.body.password1) {
+    delete req.body.password1
     req.body.password = bcrypt.hashSync(req.body.password, 12);
 
     const newSpeaker = new User(req.body);

@@ -29,13 +29,19 @@ app.use(express.urlencoded({ extended: false }));
 
 
 /* routers */
+app.use((req,res,next)=>{
+  console.log(`request from ${req.url} of type ${req.method}`);
+    next();
+});
+
 app.use(authRouter);
 
 app.use((req, res, next) => {
-  if (!req.body.token) {
-    return res.send('not logged');
+  if (!req.body.token && !req.query.token) {
+    return res.status(401).send('not logged');
   }
-  const tokenVerification = authRouter.auth(req.body.token);
+  let tokenVerification ;
+  req.body.token ? tokenVerification = authRouter.auth(req.body.token) : tokenVerification = authRouter.auth(req.query.token);
   if (tokenVerification) {
     req.body.userId = tokenVerification.id;
     next();
