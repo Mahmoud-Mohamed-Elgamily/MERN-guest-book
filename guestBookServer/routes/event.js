@@ -1,30 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require("mongoose");
-require('../models/eventModel')
-require('../models/replyModel')
+require('../models/eventModel');
+require('../models/replyModel');
 let Event = mongoose.model("event");
 
-const getEvents = () => {
-  return Event.find({})
+
+router.get('/', function (req, res) {
+  Event.find({})
     .populate("owner replies")
     .then((data) => {
-      return data;
-    }).catch((err) => {
-      return Error('DataBaseException')
+      return res.status(200).send(data);
     })
-}
-
-/* GET users listing. */
-router.get('/', function (req, res) {
-  getEvents()
-    .then(data => {
-      if (data)
-        return res.status(200).json(data);
-    })
-    .catch(err => {
-      return res.status(503).send("data base error");
-    })
+    .catch(err => res.status(503).send("DataBaseException"));
 });
 
 router.post('/', function (req, res) {
@@ -32,52 +20,26 @@ router.post('/', function (req, res) {
   const newEvent = new Event(req.body);
   newEvent.save()
     .then((data) => {
-      getEvents()
-        .then(data => {
-          if (data) {
-            return res.status(200).json(data);
-          }
-        })
-        .catch(err => {
-          return res.status(503).send("data base error");
-        });
+      return res.status(200).send(data);
     })
-    .catch((err) => {
-      console.log(err);
-
-      return res.status(503).send('data base error');
-    })
+    .catch(err => res.status(503).send("DataBaseException"));
 });
 
 router.put('/:id', function (req, res) {
-  Event.findByIdAndUpdate(req.body._id, req.body, { useFindAndModify: false })
+  Event.findByIdAndUpdate(req.body._id, req.body, { useFindAndModify: false, new: true })
     .then((data) => {
-      getEvents()
-        .then(data => {
-          if (data)
-            return res.status(200).json(data);
-        })
-        .catch((err) => {
-          return res.status(503).send("data base error");
-        })
-    }).catch((err) => {
-      return res.status(503).send("data base error");
+      console.log(data);
+      return res.status(200).send(data);
     })
+    .catch(err => res.status(503).send("DataBaseException"));
 });
 
 router.delete('/:id', function (req, res) {
   Event.findByIdAndDelete(req.body._id)
     .then((data) => {
-      getEvents()
-        .then(data => {
-          if (data)
-            return res.status(200).json(data);
-        })
-        .catch((err) => {
-          return res.status(503).send("data base error");
-        })
-    }).catch((err) => {
-      return res.status(503).send("data base error");
+      return res.status(200).send("deleted");
     })
+    .catch(err => res.status(503).send("DataBaseException"));
 });
+
 module.exports = router;

@@ -25,10 +25,7 @@ router.post("/login", (req, res) => {
         return res.status(401).send("Wrong credentials");
       }
     })
-    .catch((err) => {
-      console.log(err);
-      return res.status(503).send(err);//'database server unavailable'
-    })
+    .catch(err => res.status(503).send("DataBaseException"));
 })
 
 router.post("/register", (req, res) => {
@@ -43,9 +40,7 @@ router.post("/register", (req, res) => {
         const token = getToken(data._id);
         return res.status(200).json({ token, user: { data } });
       })
-      .catch((err) => {
-        return res.status(503).send(err);
-      })
+      .catch(err => res.status(503).send("DataBaseException"));
   } else {
     return res.status(401).send('Password Did not match');
   }
