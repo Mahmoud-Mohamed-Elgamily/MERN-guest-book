@@ -1,9 +1,7 @@
 let mongoose = require('mongoose');
+var ObjectId = require('mongodb').ObjectID;
 
-autoIncrement = require('mongoose-auto-increment');
-autoIncrement.initialize(mongoose.connection);
-
-let userSchema = new mongoose.Schema({
+let eventSchema = new mongoose.Schema({
   _id: ObjectId ,
   title: { type: String, required: true },
   description: { type: String, required: true },
@@ -11,5 +9,4 @@ let userSchema = new mongoose.Schema({
   replies: [{ type: ObjectId, ref: "reply" }],
 });
 
-userSchema.plugin(autoIncrement.plugin, 'speakers');
-let usersModel = mongoose.model("event", userSchema);
+module.exports = mongoose.model("event", eventSchema);

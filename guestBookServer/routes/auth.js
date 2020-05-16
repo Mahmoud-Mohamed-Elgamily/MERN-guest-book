@@ -1,26 +1,53 @@
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const express = require("express");
-let User = mongoose.model("user");
 const bcrypt = require("bcryptjs");
 const router = express.Router();
+require('../models/userModel')
+let User = mongoose.model("user");
+
+// generate token
+const getToken = (id) => {
+  return jwt.sign({ id: id }, 'TopSecret');
+}
 
 router.post("/login", (req, res) => {
+  console.log(req.body);
+
   User.findOne({ userName: req.body.userName })
     .then((data) => {
       if (data) {
         if (bcrypt.compare(req.body.password, data.password)) {
-          const token = jwt.sign({ id: user._id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 36000 });
-
-          return res.status(200).json({ token, user: { id: user._id } });
+          const token = getToken(data._id);
+          return res.status(200).json({ token, user: { id: data._id } });
         }
+        return res.status(401).send("Wrong credentials");
       }
-      return res.status(401).send("Wrong credentials");
     })
     .catch((err) => {
-      res.status(503).send('database server unavailable');
+      console.log(err);
+      return res.status(503).send(err);//'database server unavailable'
     })
 })
 
+router.post("/register", (req, res) => {
+
+  if (req.body.password == req.body.password2) {
+    delete req.body.password2
+    req.body.password = bcrypt.hashSync(req.body.password, 12);
+
+    const newSpeaker = new User(req.body);
+    newSpeaker.save()
+      .then((data) => {
+        const token = getToken(data._id);
+        return res.status(200).json({ token, user: { data } });
+      })
+      .catch((err) => {
+        return res.status(503).send(err);
+      })
+  } else {
+    return res.status(401).send('Password Did not match');
+  }
+})
 
 module.exports = router;
