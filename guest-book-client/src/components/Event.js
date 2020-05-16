@@ -30,7 +30,6 @@ const Event = () => {
           </div>
         </div>
       ))}
-      <h1> events works </h1>
     </div>
   );
 };
