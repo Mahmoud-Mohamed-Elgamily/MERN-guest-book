@@ -6,9 +6,10 @@ const router = express.Router();
 require('../models/userModel')
 let User = mongoose.model("user");
 
+let hashCode = 'TopSecret';
 // generate token
 const getToken = (id) => {
-  return jwt.sign({ id: id }, 'TopSecret');
+  return jwt.sign({ id: id }, hashCode);
 }
 
 router.post("/login", (req, res) => {
@@ -50,4 +51,14 @@ router.post("/register", (req, res) => {
   }
 })
 
+const Authenticate = (token) => {
+  return jwt.verify(token, hashCode, (err, decoded) => {
+    if (decoded)
+      return decoded;
+    else
+      return 0
+  });
+}
+
 module.exports = router;
+module.exports.auth = Authenticate;
